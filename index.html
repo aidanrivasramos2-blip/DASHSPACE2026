@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070b1a">
+  <meta name="description" content="DashSpace: un juego de plataformas rítmico de ciencia ficción. En desarrollo. Lanzamiento previsto: enero de 2027.">
+  <title>DashSpace — El ritmo del espacio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23090e23'/%3E%3Cpath d='M50 13 84 32 50 52 16 32Z' fill='%233adcf4'/%3E%3Cpath d='M16 32 50 52 50 88 16 68Z' fill='%23165da6'/%3E%3Cpath d='M84 32 50 52 50 88 84 68Z' fill='%23e9952e'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070b1a;
+      --panel: rgba(13, 22, 47, .78);
+      --line: rgba(111, 194, 255, .17);
+      --text: #f4f8ff;
+      --muted: #a5b4d0;
+      --cyan: #52e6ff;
+      --gold: #ffd36a;
+      --violet: #9a83ff;
+      --green: #62f3c4;
+      --radius: 22px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+    body {
+      margin: 0; min-width: 320px; color: var(--text); overflow-x: hidden;
+      background:
+        radial-gradient(ellipse at 80% 18%, rgba(59,82,174,.2), transparent 34rem),
+        radial-gradient(ellipse at 12% 58%, rgba(0,180,222,.1), transparent 36rem),
+        var(--bg);
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .35; z-index: -1;
+      background-image:
+        radial-gradient(1px 1px at 8% 18%, #b9ecff 98%, transparent),
+        radial-gradient(1px 1px at 24% 62%, #8bc9ff 98%, transparent),
+        radial-gradient(1px 1px at 54% 12%, #fff 98%, transparent),
+        radial-gradient(1px 1px at 76% 42%, #b9ecff 98%, transparent),
+        radial-gradient(1px 1px at 91% 75%, #fff 98%, transparent);
+      background-size: 420px 360px;
+    }
+    a { color: inherit; text-decoration: none; }
+    .wrap { width: min(1120px, calc(100% - 44px)); margin-inline: auto; }
+    header { padding: 22px 0; }
+    .nav { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .brand { display:flex; align-items:center; gap:12px; font-size:18px; font-weight:850; letter-spacing:.12em; }
+    .brand-mark { width:39px; height:39px; filter:drop-shadow(0 0 12px rgba(82,230,255,.38)); }
+    .nav-right { display:flex; align-items:center; gap:22px; }
+    .nav-link { color:#b8c8e2; font-size:13px; font-weight:700; transition:color .2s; }
+    .nav-link:hover { color:var(--cyan); }
+    .status { display:inline-flex; align-items:center; gap:9px; border:1px solid rgba(98,243,196,.24); border-radius:999px; padding:9px 14px; color:#b8ffe7; background:rgba(22,78,69,.18); font-size:11px; font-weight:750; letter-spacing:.12em; text-transform:uppercase; white-space:nowrap; }
+    .status i { width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 13px var(--green); animation:pulse 1.6s ease-in-out infinite; }
+    main { padding:30px 0 82px; }
+    .hero { min-height:540px; display:grid; grid-template-columns:1.03fr .97fr; align-items:center; gap:38px; padding:42px 0 58px; }
+    .eyebrow { display:flex; align-items:center; gap:12px; color:var(--cyan); font-size:12px; letter-spacing:.23em; font-weight:800; text-transform:uppercase; }
+    .eyebrow::before { content:""; width:34px; height:1px; background:var(--cyan); box-shadow:0 0 12px var(--cyan); }
+    h1 { max-width:650px; margin:22px 0 20px; font-size:clamp(44px,6.4vw,78px); line-height:.99; letter-spacing:-.055em; }
+    h1 span { color:var(--cyan); text-shadow:0 0 34px rgba(82,230,255,.22); }
+    .intro { max-width:560px; color:#bdc9df; font-size:18px; line-height:1.72; }
+    .intro strong { color:#f3f7ff; font-weight:700; }
+    .hero-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:28px; }
+    .button { display:inline-flex; align-items:center; justify-content:center; gap:10px; min-height:49px; border-radius:13px; padding:0 19px; border:1px solid rgba(82,230,255,.5); background:linear-gradient(135deg,rgba(15,119,154,.88),rgba(39,65,139,.82)); box-shadow:0 10px 32px rgba(7,146,180,.15); font-size:14px; font-weight:800; transition:transform .18s ease,filter .18s ease,box-shadow .18s ease; }
+    .button:hover { transform:translateY(-2px); filter:brightness(1.15); box-shadow:0 14px 38px rgba(7,146,180,.25); }
+    .button:focus-visible, a:focus-visible { outline:2px solid var(--gold); outline-offset:4px; }
+    .button.secondary { background:rgba(16,25,52,.68); border-color:rgba(170,194,240,.2); box-shadow:none; color:#dce7fb; }
+    .hero-art { position:relative; display:grid; place-items:center; min-height:430px; isolation:isolate; }
+    .orbit { position:absolute; width:min(390px,78vw); aspect-ratio:1; border:1px solid rgba(75,221,255,.58); border-radius:50%; box-shadow:0 0 55px rgba(27,194,255,.11),inset 0 0 45px rgba(27,194,255,.08); transform:rotate(-18deg) scaleY(.58); }
+    .orbit::before,.orbit::after { content:""; position:absolute; width:12px; height:12px; border-radius:50%; background:var(--gold); box-shadow:0 0 20px var(--gold); }
+    .orbit::before { top:18%; left:15%; }
+    .orbit::after { bottom:17%; right:13%; background:var(--cyan); box-shadow:0 0 20px var(--cyan); }
+    .orbit.second { width:min(320px,65vw); border-color:rgba(154,131,255,.5); transform:rotate(38deg) scaleY(.65); animation:rotate 26s linear infinite; }
+    .halo { position:absolute; width:270px; aspect-ratio:1; border-radius:50%; background:radial-gradient(circle,rgba(32,207,255,.18),rgba(36,101,210,.08) 45%,transparent 72%); filter:blur(8px); }
+    .cube { position:relative; width:218px; max-width:48vw; filter:drop-shadow(0 0 22px rgba(40,221,255,.22)); animation:float 4s ease-in-out infinite; }
+    .art-label { position:absolute; bottom:22px; left:50%; transform:translateX(-50%); white-space:nowrap; color:#a9c7e7; font-size:11px; letter-spacing:.2em; text-transform:uppercase; }
+    .countdown-panel { position:relative; overflow:hidden; display:grid; grid-template-columns:.82fr 1.18fr; align-items:center; gap:32px; padding:30px; border:1px solid rgba(82,230,255,.24); border-radius:var(--radius); background:linear-gradient(120deg,rgba(13,24,52,.94),rgba(14,28,58,.69)); box-shadow:0 26px 80px rgba(0,0,0,.22); }
+    .countdown-panel::before { content:""; position:absolute; right:-90px; top:-120px; width:310px; height:310px; border:1px solid rgba(82,230,255,.13); border-radius:50%; box-shadow:0 0 0 25px rgba(82,230,255,.025),0 0 0 54px rgba(82,230,255,.02); pointer-events:none; }
+    .date-label { color:var(--muted); font-size:11px; font-weight:800; letter-spacing:.22em; text-transform:uppercase; }
+    .launch-date { margin-top:12px; color:var(--gold); font-size:clamp(28px,3.8vw,42px); line-height:1.08; font-weight:850; letter-spacing:-.035em; }
+    .launch-note { margin-top:10px; color:#92a4c5; font-size:13px; }
+    .launch-message { position:relative; z-index:1; text-align:center; padding:24px; border:1px solid rgba(82,230,255,.2); border-radius:18px; background:rgba(4,11,28,.45); }
+    .launch-icon { display:inline-grid; place-items:center; width:64px; height:64px; border-radius:19px; background:rgba(82,230,255,.09); border:1px solid rgba(82,230,255,.2); font-size:30px; box-shadow:0 0 30px rgba(82,230,255,.08); }
+    .launch-message h2 { margin:15px 0 8px; color:var(--cyan); font-size:22px; letter-spacing:.12em; }
+    .launch-message p { max-width:360px; margin:0 auto; color:var(--muted); font-size:14px; line-height:1.6; }
+    .section-title { display:flex; align-items:end; justify-content:space-between; gap:20px; margin:87px 0 24px; }
+    .section-title h2 { margin:0; font-size:clamp(26px,3.3vw,38px); letter-spacing:-.04em; }
+    .section-title p { margin:0; color:#91a5c5; font-size:14px; }
+    .features { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+    .feature { min-height:165px; padding:24px; border:1px solid var(--line); border-radius:18px; background:linear-gradient(145deg,rgba(14,27,58,.8),rgba(9,16,36,.68)); transition:transform .22s ease,border-color .22s ease,background .22s ease; }
+    .feature:hover { transform:translateY(-5px); border-color:rgba(82,230,255,.42); background:linear-gradient(145deg,rgba(18,39,77,.9),rgba(9,16,36,.8)); }
+    .feature .num { color:var(--cyan); font-size:12px; font-weight:850; letter-spacing:.18em; }
+    .feature h3 { margin:16px 0 8px; font-size:18px; }
+    .feature p { margin:0; color:#a5b4cf; font-size:14px; line-height:1.6; }
+    .closing { margin-top:26px; padding:22px 24px; display:flex; align-items:center; justify-content:space-between; gap:20px; border:1px solid rgba(154,131,255,.2); border-radius:18px; background:linear-gradient(100deg,rgba(55,42,112,.2),rgba(10,24,53,.35)); }
+    .closing p { margin:0; color:#c0cde4; font-size:14px; line-height:1.6; }
+    .closing strong { color:#fff; }
+    footer { border-top:1px solid rgba(133,166,220,.12); padding:24px 0 34px; color:#8293b1; font-size:12px; }
+    .footer-inner { display:flex; justify-content:space-between; align-items:center; gap:16px; }
+    .footer-brand { color:#c6d4ec; font-weight:800; letter-spacing:.12em; }
+    @keyframes float { 0%,100% { transform:translateY(-9px) rotate(-2deg); } 50% { transform:translateY(9px) rotate(2deg); } }
+    @keyframes rotate { to { transform:rotate(398deg) scaleY(.65); } }
+    @keyframes pulse { 50% { opacity:.5; transform:scale(.82); } }
+    @media (max-width:820px) {
+      .hero { grid-template-columns:1fr; gap:8px; padding-top:34px; }
+      .hero-copy { text-align:center; }
+      .eyebrow { justify-content:center; }
+      .intro { margin-inline:auto; }
+      .hero-actions { justify-content:center; }
+      .hero-art { min-height:350px; }
+      .countdown-panel { grid-template-columns:1fr; gap:23px; text-align:center; }
+      .features { grid-template-columns:1fr; }
+      .section-title { align-items:start; flex-direction:column; }
+      .nav-right { gap:13px; }
+    }
+    @media (max-width:520px) {
+      .wrap { width:min(100% - 30px,1120px); }
+      header { padding:16px 0; }
+      .brand { font-size:14px; gap:8px; }
+      .brand-mark { width:33px; height:33px; }
+      .nav-right { gap:9px; }
+      .nav-link { display:none; }
+      .status { padding:8px 10px; font-size:9px; letter-spacing:.08em; }
+      main { padding-top:12px; }
+      .hero { padding:28px 0 35px; }
+      h1 { font-size:46px; }
+      .intro { font-size:16px; }
+      .hero-art { min-height:300px; }
+      .cube { width:176px; }
+      .countdown-panel { padding:22px 14px; }
+      .launch-message { padding:20px 14px; }
+      .art-label { font-size:9px; letter-spacing:.12em; }
+      .closing { align-items:flex-start; flex-direction:column; }
+      .footer-inner { align-items:start; flex-direction:column; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="#inicio" aria-label="DashSpace, inicio">
+        <svg class="brand-mark" viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M50 9 88 31 50 53 12 31Z" fill="#52e6ff"/>
+          <path d="M12 31 50 53 50 93 12 71Z" fill="#1766ad"/>
+          <path d="M88 31 50 53 50 93 88 71Z" fill="#ed9633"/>
+          <path d="m50 9 38 22v40L50 93 12 71V31Z" fill="none" stroke="#d6f8ff" stroke-width="3"/>
+          <path d="m50 53 0 40M12 31l38 22 38-22" fill="none" stroke="#fff" stroke-width="2.2" opacity=".9"/>
+        </svg>
+        <span>DASHSPACE</span>
+      </a>
+      <div class="nav-right">
+        <a class="nav-link" href="#about-heading">EL JUEGO</a>
+        <a class="nav-link" href="#lanzamiento">LANZAMIENTO</a>
+        <span class="status"><i aria-hidden="true"></i> En desarrollo</span>
+      </div>
+    </div>
+  </header>
+
+  <main id="inicio" class="wrap">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="eyebrow">Una aventura rítmica espacial</div>
+        <h1 id="hero-title">El ritmo del<br><span>espacio</span> te espera.</h1>
+        <p class="intro"><strong>DashSpace</strong> es un juego de plataformas rítmico de ciencia ficción. Salta, esquiva obstáculos y cambia de forma mientras recorres rutas entre las estrellas. El juego todavía no está acabado: estamos preparando niveles, música y detalles para el lanzamiento.</p>
+        <div class="hero-actions">
+          <a class="button" href="#lanzamiento">LANZAMIENTO <span aria-hidden="true">↓</span></a>
+          <a class="button secondary" href="#about-heading">CONOCE EL JUEGO <span aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+      <div class="hero-art" aria-label="Un cubo de DashSpace flotando entre órbitas">
+        <div class="halo" aria-hidden="true"></div><div class="orbit" aria-hidden="true"></div><div class="orbit second" aria-hidden="true"></div>
+        <svg class="cube" viewBox="0 0 240 260" role="img" aria-label="Cubo espacial azul y dorado">
+          <defs>
+            <linearGradient id="top" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#55efff"/><stop offset="1" stop-color="#1599e8"/></linearGradient>
+            <linearGradient id="left" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#238ad6"/><stop offset="1" stop-color="#10417f"/></linearGradient>
+            <linearGradient id="right" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffd45c"/><stop offset="1" stop-color="#da7028"/></linearGradient>
+          </defs>
+          <path d="M120 20 220 76 120 134 20 76Z" fill="url(#top)" stroke="#e7fbff" stroke-width="4"/>
+          <path d="M20 76 120 134 120 246 20 188Z" fill="url(#left)" stroke="#9beeff" stroke-width="4"/>
+          <path d="M220 76 120 134 120 246 220 188Z" fill="url(#right)" stroke="#fff0b2" stroke-width="4"/>
+          <path d="M80 76 120 53 160 76M91 86l13 8m45-8-13 8M105 108l15 9 15-9" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M120 134v112" stroke="#fff" stroke-width="3" opacity=".8"/>
+        </svg>
+        <div class="art-label">Salta · esquiva · sigue el pulso</div>
+      </div>
+    </section>
+
+    <section id="lanzamiento" class="countdown-panel" aria-labelledby="launch-heading">
+      <div>
+        <div class="date-label" id="launch-heading">Lanzamiento previsto</div>
+        <div class="launch-date">ENERO<br>DE 2027</div>
+        <div class="launch-note">El despegue está cada vez más cerca.</div>
+      </div>
+      <div class="launch-message">
+        <span class="launch-icon" aria-hidden="true">🚀</span>
+        <h2>PRÓXIMAMENTE</h2>
+        <p>Prepárate para explorar el universo de DashSpace. La aventura comienza en enero de 2027.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="about-heading">
+      <div class="section-title">
+        <h2 id="about-heading">Una ruta nueva cada vez.</h2>
+        <p>El proyecto sigue creciendo.</p>
+      </div>
+      <div class="features">
+        <article class="feature">
+          <div class="num">01 / RITMO</div>
+          <h3>Salta al compás</h3>
+          <p>Lee los obstáculos, calcula el momento y encuentra tu ritmo en cada nivel.</p>
+        </article>
+        <article class="feature">
+          <div class="num">02 / RUTAS</div>
+          <h3>Explora 48 niveles</h3>
+          <p>Avanza por rutas espaciales con retos y dificultades diferentes.</p>
+        </article>
+        <article class="feature">
+          <div class="num">03 / TU PILOTO</div>
+          <h3>Cambia de forma</h3>
+          <p>Elige entre seis vehículos y personaliza iconos y colores.</p>
+        </article>
+      </div>
+      <div class="closing">
+        <p><strong>El universo de DashSpace te espera.</strong><br>Seguimos trabajando para preparar el lanzamiento.</p>
+        <a class="button secondary" href="#inicio">VOLVER ARRIBA ↑</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <span class="footer-brand">DASHSPACE</span>
+      <span>Juego en desarrollo · Fecha prevista: enero de 2027</span>
+    </div>
+  </footer>
+</body>
+</html>
